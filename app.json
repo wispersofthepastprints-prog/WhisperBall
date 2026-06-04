@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Whisper Ball",
+    "slug": "whisper-ball",
+    "version": "1.0.0",
+    "orientation": "landscape",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0A"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wispersofthepast.whisperball"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0A0A0A"
+      },
+      "package": "com.wispersofthepast.whisperball",
+      "versionCode": 1,
+      "permissions": [
+        "VIBRATE",
+        "INTERNET"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-av"
+    ],
+    "extra": {
+      "revenueCatApiKeyAndroid": "YOUR_ANDROID_API_KEY",
+      "revenueCatApiKeyIOS": "YOUR_IOS_API_KEY"
+    }
+  }
+}
