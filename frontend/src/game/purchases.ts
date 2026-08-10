@@ -1,7 +1,7 @@
 import Purchases from 'react-native-purchases';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_KEY = 'test_xxxxxxxxxxxxxxxx'; // TODO: replace with production key before release
+const API_KEY = 'goog_vRwEGCkAowVJZXTwGZQchzSrjbA'; // TODO: replace with production key before release
 
 const REMOVE_ADS_ID = 'remove_ads';
 const PREMIUM_PACK_ID = 'premium_pack';
