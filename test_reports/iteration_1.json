@@ -1,0 +1,34 @@
+{
+  "summary": "Frontend-only testing of Whisper Ball (Expo/React Native landscape pong). PRIMARY BUG (dark game screen, no HUD/court/paddles/ball) is NOT REPRODUCIBLE — at both 1280x600 (landscape mobile) and 1920x800 (desktop) viewports, /game?mode=quick renders correctly: HUD with score (0·1), 'QUICK MATCH · FIRST TO 7' label, court with center dashed line, both paddles (ivory), gold ball, and rally counter. All 5 main menu modes navigate correctly. Pause overlay (Resume/Restart/Quit) works. Back button returns to /. Campaign shows 50 tiles (Level 1 unlocked, 2-50 locked with lock icon). Settings shows Whisper theme (active), 1972 (locked, '50-hit rally (best 0)'), and Sound/Haptics toggles. Local 2P renders with both touch zones. Paddle drag gestures work (rally count incremented to 2 during a drag). Deprecation warnings detected: shadow* props and props.pointerEvents — should migrate to boxShadow and style.pointerEvents.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "game", "issues": ["The 'dark screen' the reporter saw is likely caused by capturing a screenshot BEFORE the View's onLayout fired (court has flex:1 and depends on parent height; until onLayout runs and serve() is called, the ball/paddles are at 0,0 with paddleH=0 since paddleH is initialized to PADDLE_BASE_H*level.paddleSize but p1y/p2y stay at 0 until onLayout). On a very tall/portrait viewport (e.g., the legacy 1920x800 screenshot was wide, but if testing happened with the iframe still loading the layout, paddles render at y=0 which is off the top edge). Recommend initializing p1y/p2y to a sensible default OR rendering paddles conditionally only when court.w>0 to avoid the flash of zero-positioned elements."]}
+    ],
+    "react_native_issues": [
+      {"component": "game.tsx", "issue": "Uses legacy pointerEvents prop on <View> (deprecated in RN 0.81). Console warning: 'props.pointerEvents is deprecated. Use style.pointerEvents'. Reference: /app/frontend/app/game.tsx:651,667,752,777,789,799,809,818,890,910,931"},
+      {"component": "game.tsx styles", "issue": "Uses deprecated shadow* style props (shadowOffset, shadowOpacity, shadowRadius, shadowColor) on paddle/ball/obstacle. Console warning: 'shadow* style props are deprecated. Use boxShadow'. Reference: /app/frontend/app/game.tsx:1122-1124,1134-1136,1143-1145 and inline shadowColor at 749,774,785,796,806,814"}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "PRIMARY BUG IS A FALSE POSITIVE — game screen renders correctly on web preview at both 1280x600 and 1920x800. Recommend the reporter re-screenshot after ~1.5s so onLayout/serve completes.",
+    "Migrate `pointerEvents` JSX prop to `style={{ pointerEvents: 'box-none'|'none' }}` in game.tsx (multiple locations) to silence deprecation warning and future-proof for RN 0.82+.",
+    "Migrate `shadowOffset/shadowOpacity/shadowRadius/shadowColor` styles to `boxShadow` in game.tsx StyleSheet (and inline shadowColor on Animated.Views).",
+    "Optional safety: gate paddle/ball Animated.Views on `court.w > 0` to avoid initial flash of zero-positioned elements at top-left."
+  ],
+  "critical_code_review_comments": [
+    "game.tsx is 1213 lines — exceeds the 700-line guideline. Recommend extracting Scanlines, CenterLine, Overlay, OverlayBtn, EndOverlay into /src/game/components/ and moving the physics worklet into /src/game/physics.ts.",
+    "cpuMode variable on line 328 is declared but never used (set to 1 and unused).",
+    "Math.random() is called inside the worklet (lines 411, 428, 215) but Math.random is JS — on UI thread worklets this is fine because RN polyfills it, but consider using shared seed for deterministic daily challenges (currently daily challenge uses mulberry32 only for level params, not for paddle/serve angles, so the 'deterministic seed per date' contract is partially violated)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All 4 game modes (quick, campaign, daily, local2p) and settings render correctly on web preview. Use viewport 1280x600 or 1920x800 (landscape). Wait ~2s after navigating to /game?mode=X for the court onLayout to fire before screenshotting. The reported 'dark screen' bug could not be reproduced.",
+  "rca_of_issue": "Reported 'dark game screen' bug: ROOT CAUSE — likely a premature screenshot captured before the court View's onLayout callback fired and serve() initialized the ball/paddle shared values. The court uses flex:1 and depends on the parent's measured height; before onLayout, courtW=0, courtH=0, p1y=0, p2y=0, so paddles render at the top-left edge invisibly. Once onLayout fires (within ~16ms on real devices but can be slower in a web iframe still loading), serve() runs and everything becomes visible. MITIGATION: Render paddles/ball only when court.w>0 OR initialize p1y/p2y to a sensible default and re-trigger when layout arrives. CONFIRMED RENDER WORKS: Both screenshots at 1280x600 and 1920x800 captured after 2.5s wait show fully rendered game (HUD, score 0·1, court, paddles, ball, dashed center line)."
+}
