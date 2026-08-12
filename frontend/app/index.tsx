@@ -12,23 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useEffect } from "react";
-import { GameScreen } from "@/src/components/GameScreen";
 import { initPurchases } from "@/src/game/purchases";
-
-export default function Index() {
-  useEffect(() => {
-    initPurchases().catch(console.error);
-  }, []);
-
-  return <GameScreen />;
-}
-
-// Inside your main component, add:
-useEffect(() => {
-  initPurchases().catch(console.error);
-}, []);
-
 import {
   getBestRally,
   getGamesPlayed,
@@ -60,6 +44,11 @@ export default function WhisperBallLanding() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
+  // Initialize RevenueCat on app start
+  useEffect(() => {
+    initPurchases().catch(console.error);
+  }, []);
+
   // Real persisted stats
   const [bestRally, setBestRally] = useState(0);
   const [gamesPlayed, setGamesPlayed] = useState(0);
@@ -72,7 +61,7 @@ export default function WhisperBallLanding() {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
 
-  // Time-of-day greeting — replaces the hardcoded "Good morning."
+  // Time-of-day greeting
   const greeting = useMemo(() => {
     const h = new Date().getHours();
     if (h < 5) return "Up late.";
@@ -94,7 +83,6 @@ export default function WhisperBallLanding() {
           getUnlocked1972(),
         ]);
         if (!mounted) return;
-        // s.themeId is read for future theming hooks; design palette stays constant for now.
         void s;
         setBestRally(br);
         setGamesPlayed(gp);
@@ -173,9 +161,6 @@ export default function WhisperBallLanding() {
     router.push(path as any);
   };
 
-  // All four modes are unlocked from the start in our game (Campaign levels
-  // unlock progressively inside the Campaign screen). The lock UI is preserved
-  // for future progression but currently only applies to the 1972 theme below.
   const gameModes: ModeDef[] = [
     {
       id: "campaign",
@@ -218,7 +203,6 @@ export default function WhisperBallLanding() {
     },
   ];
 
-  // Progress hint targets the only real progression in the game: the 1972 theme.
   const hitsToUnlock = Math.max(0, 50 - bestRally);
   const progressHint = unlocked1972
     ? "1972 theme unlocked. Try it in Settings."
@@ -304,7 +288,7 @@ export default function WhisperBallLanding() {
           </View>
         </Animated.View>
 
-        {/* Primary CTA — Quick Match */}
+        {/* Primary CTA */}
         <Animated.View
           style={[
             styles.ctaContainer,
@@ -388,7 +372,7 @@ export default function WhisperBallLanding() {
           ))}
         </View>
 
-        {/* Progress Hint — 1972 theme unlock */}
+        {/* Progress Hint */}
         {(progressHint || (!unlocked1972 && bestRally > 0)) && (
           <View style={styles.progressHint}>
             <Ionicons name="trophy-outline" size={16} color="#C9A227" />
