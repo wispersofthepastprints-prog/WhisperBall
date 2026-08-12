@@ -4,6 +4,12 @@ import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { initPurchases } from "@/src/game/purchases";
+
+// Add this useEffect
+useEffect(() => {
+  initPurchases().catch(console.error);
+}, []);
 
 import { useIconFonts } from "@/src/hooks/use-icon-fonts";
 

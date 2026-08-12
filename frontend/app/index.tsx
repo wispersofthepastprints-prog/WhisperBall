@@ -12,6 +12,22 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useEffect } from "react";
+import { GameScreen } from "@/src/components/GameScreen";
+import { initPurchases } from "@/src/game/purchases";
+
+export default function Index() {
+  useEffect(() => {
+    initPurchases().catch(console.error);
+  }, []);
+
+  return <GameScreen />;
+}
+
+// Inside your main component, add:
+useEffect(() => {
+  initPurchases().catch(console.error);
+}, []);
 
 import {
   getBestRally,
