@@ -822,33 +822,34 @@ function GameInner({
   };
 
   // ===== Gestures (horizontal drag now) =====
- const p1Gesture = useMemo(
-   () =>
-     Gesture.Pan()
-       .onUpdate((e) => {
-         "worklet";
-         p1tx.value = e.x;
-       })
-       .onStart((e) => {
-         "worklet";
-         p1tx.value = e.x;
-       }),
-   [p1tx],
- );
-
- const p2Gesture = useMemo(
-   () =>
-     Gesture.Pan()
-       .onUpdate((e) => {
-         "worklet";
-         p2tx.value = e.x;
-       })
-       .onStart((e) => {
-         "worklet";
-         p2tx.value = e.x;
-       }),
-   [p2tx], // remove 'mode' from deps — not needed anymore
- );
+const courtGesture = useMemo(
+  () =>
+    Gesture.Manual()
+      .onTouchesDown((e, manager) => {
+        "worklet";
+        for (const touch of e.allTouches) {
+          const half = courtH.value / 2;
+          if (touch.y > half) {
+            p1tx.value = touch.x;
+          } else {
+            p2tx.value = touch.x;
+          }
+        }
+        manager.activate();
+      })
+      .onTouchesMove((e, manager) => {
+        "worklet";
+        for (const touch of e.changedTouches) {
+          const half = courtH.value / 2;
+          if (touch.y > half) {
+            p1tx.value = touch.x;
+          } else {
+            p2tx.value = touch.x;
+          }
+        }
+      }),
+  [p1tx, p2tx, courtH],
+);
 
   // ===== Animated styles =====
   const ballStyle = useAnimatedStyle(() => ({
@@ -1044,18 +1045,9 @@ function GameInner({
         )}
 
         {/* Touch zones — top half + bottom half */}
-        <GestureDetector gesture={p1Gesture}>
-          <View
-            style={[styles.touchZoneBottom, { height: court.h / 2 || "50%" }]}
-            testID="touch-zone-p1"
-          />
-        </GestureDetector>
-        <GestureDetector gesture={p2Gesture}>
-          <View
-            style={[styles.touchZoneTop, { height: court.h / 2 || "50%" }]}
-            testID="touch-zone-p2"
-          />
-        </GestureDetector>
+	<GestureDetector gesture={courtGesture}>
+	  <View style={styles.courtOverlay} testID="court-touch-overlay" />
+	</GestureDetector>
 
         {/* Paddles + ball — gated on layout */}
         {court.w > 0 && (
