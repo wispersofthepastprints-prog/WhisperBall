@@ -822,34 +822,33 @@ function GameInner({
   };
 
   // ===== Gestures (horizontal drag now) =====
-  const p1Gesture = useMemo(
-    () =>
-      Gesture.Pan()
-        .onUpdate((e) => {
-          "worklet";
-          p1tx.value = e.x;
-        })
-        .onStart((e) => {
-          "worklet";
-          p1tx.value = e.x;
-        }),
-    [p1tx],
-  );
+ const p1Gesture = useMemo(
+   () =>
+     Gesture.Pan()
+       .onUpdate((e) => {
+         "worklet";
+         p1tx.value = e.x;
+       })
+       .onStart((e) => {
+         "worklet";
+         p1tx.value = e.x;
+       }),
+   [p1tx],
+ );
 
-  const p2Gesture = useMemo(
-    () =>
-      Gesture.Pan()
-        .enabled(mode === "local2p")
-        .onUpdate((e) => {
-          "worklet";
-          p2tx.value = e.x;
-        })
-        .onStart((e) => {
-          "worklet";
-          p2tx.value = e.x;
-        }),
-    [p2tx, mode],
-  );
+ const p2Gesture = useMemo(
+   () =>
+     Gesture.Pan()
+       .onUpdate((e) => {
+         "worklet";
+         p2tx.value = e.x;
+       })
+       .onStart((e) => {
+         "worklet";
+         p2tx.value = e.x;
+       }),
+   [p2tx], // remove 'mode' from deps — not needed anymore
+ );
 
   // ===== Animated styles =====
   const ballStyle = useAnimatedStyle(() => ({
