@@ -847,6 +847,9 @@ function GameInner({
           "worklet";
           p2tx.value = e.x;
         })
+        .enabled(mode === "local2p"),
+    [p2tx, mode],
+  );
 
   // ===== Animated styles =====
   const ballStyle = useAnimatedStyle(() => ({
