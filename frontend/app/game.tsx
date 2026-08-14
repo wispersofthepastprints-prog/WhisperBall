@@ -821,9 +821,6 @@ function GameInner({
     }
   };
 
-  // ===== Gestures (horizontal drag now) =====
-const courtGesture = useMemo(
-  () =>
   // ===== Gestures (horizontal drag) =====
   const p1Gesture = useMemo(
     () =>
