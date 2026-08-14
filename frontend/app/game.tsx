@@ -847,9 +847,6 @@ function GameInner({
           "worklet";
           p2tx.value = e.x;
         })
-        .enabled(mode === "local2p"),
-    [p2tx, mode], // ← FIX: added 'mode' to deps
-  );
 
   // ===== Animated styles =====
   const ballStyle = useAnimatedStyle(() => ({
@@ -1045,35 +1042,18 @@ function GameInner({
         )}
 
         {/* Touch zones — top half + bottom half */}
-  // ===== Gestures (horizontal drag) =====
-  const p1Gesture = useMemo(
-    () =>
-      Gesture.Pan()
-        .onUpdate((e) => {
-          "worklet";
-          p1tx.value = e.x;
-        })
-        .onStart((e) => {
-          "worklet";
-          p1tx.value = e.x;
-        }),
-    [p1tx],
-  );
-
-  const p2Gesture = useMemo(
-    () =>
-      Gesture.Pan()
-        .onUpdate((e) => {
-          "worklet";
-          p2tx.value = e.x;
-        })
-        .onStart((e) => {
-          "worklet";
-          p2tx.value = e.x;
-        })
-        .enabled(mode === "local2p"),
-    [p2tx, mode], // ← FIX: added 'mode' to deps
-  );
+        <GestureDetector gesture={p1Gesture}>
+          <View
+            style={[styles.touchZoneBottom, { height: court.h / 2 || "50%" }]}
+            testID="touch-zone-p1"
+          />
+        </GestureDetector>
+        <GestureDetector gesture={p2Gesture}>
+          <View
+            style={[styles.touchZoneTop, { height: court.h / 2 || "50%" }]}
+            testID="touch-zone-p2"
+          />
+        </GestureDetector>
 
         {/* Paddles + ball — gated on layout */}
         {court.w > 0 && (
