@@ -483,6 +483,8 @@ function GameInner({
       const step = Math.max(-maxSpeed * dt, Math.min(maxSpeed * dt, diff));
       p2tx.value += step;
     }
+    p1x.value = p1tx.value;
+    p2x.value = p2tx.value;
 
     // Clamp paddles within court
     const halfP = paddleW.value / 2;
