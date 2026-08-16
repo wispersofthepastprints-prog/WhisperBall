@@ -824,33 +824,34 @@ function GameInner({
   };
 
   // ===== Gestures (horizontal drag) =====
-  const p1Gesture = useMemo(
+  // ===== Gestures (multi-touch manual) =====
+  const courtGesture = useMemo(
     () =>
-      Gesture.Pan()
-        .onUpdate((e) => {
+      Gesture.Manual()
+        .onTouchesDown((e, manager) => {
           "worklet";
-          p1tx.value = e.x;
+          for (const touch of e.allTouches) {
+            const half = courtH.value / 2;
+            if (touch.y > half) {
+              p1tx.value = touch.x;
+            } else {
+              p2tx.value = touch.x;
+            }
+          }
+          manager.activate();
         })
-        .onStart((e) => {
+        .onTouchesMove((e, manager) => {
           "worklet";
-          p1tx.value = e.x;
+          for (const touch of e.changedTouches) {
+            const half = courtH.value / 2;
+            if (touch.y > half) {
+              p1tx.value = touch.x;
+            } else {
+              p2tx.value = touch.x;
+            }
+          }
         }),
-    [p1tx],
-  );
-
-  const p2Gesture = useMemo(
-    () =>
-      Gesture.Pan()
-        .onUpdate((e) => {
-          "worklet";
-          p2tx.value = e.x;
-        })
-        .onStart((e) => {
-          "worklet";
-          p2tx.value = e.x;
-        })
-        .enabled(mode === "local2p"),
-    [p2tx, mode],
+    [p1tx, p2tx, courtH],
   );
 
   // ===== Animated styles =====
@@ -1047,17 +1048,8 @@ function GameInner({
         )}
 
         {/* Touch zones — top half + bottom half */}
-        <GestureDetector gesture={p1Gesture}>
-          <View
-            style={[styles.touchZoneBottom, { height: court.h / 2 || "50%" }]}
-            testID="touch-zone-p1"
-          />
-        </GestureDetector>
-        <GestureDetector gesture={p2Gesture}>
-          <View
-            style={[styles.touchZoneTop, { height: court.h / 2 || "50%" }]}
-            testID="touch-zone-p2"
-          />
+        <GestureDetector gesture={courtGesture}>
+          <View style={StyleSheet.absoluteFill} testID="court-touch-overlay" />
         </GestureDetector>
 
         {/* Paddles + ball — gated on layout */}
